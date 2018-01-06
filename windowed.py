@@ -25,8 +25,19 @@ textPad ["insertofftime"] = 0
 
 root.geometry("%dx%d" % (windowWidth, windowHeight))
 
-textPad["width"] = int(windowWidth / 8)
-textPad["height"] = int(windowHeight / 16)
+
+#Remove borders
+textPad["borderwidth"] = 0
+textPad["highlightthickness"] = 0
+textPad.vbar["borderwidth"] = 0
+textPad.vbar["background"] = "black"
+textPad.vbar["width"] = 3
+
+# here the main thing is that the dimensions must be larger than the root windows dimensions
+# The width and height is meassured in rows and columns
+textPad["width"] = int(windowWidth)
+textPad["height"] = int(windowHeight)
+textPad["cursor"] = "none"
 
 
 textPad.pack()
@@ -101,5 +112,7 @@ def hello(args):
 
 textPad.focus()
 textPad.bind("<Control-BackSpace>", backspace_word)
+
+root.configure(background="white")
 
 root.mainloop()
