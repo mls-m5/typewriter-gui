@@ -9,6 +9,8 @@ import tkinter.font as tkfont
 
 import os
 
+import hashlib
+
 import sync #my synching methods
 
 import datetime #for filenames
@@ -38,7 +40,9 @@ textPad.vbar["width"] = 3
 textPad["width"] = int(windowWidth)
 textPad["height"] = int(windowHeight)
 textPad["cursor"] = "none"
-
+textPad["wrap"] = "word"
+textPad["padx"] = 5
+textPad["pady"] = 5
 
 textPad.pack()
 
@@ -63,9 +67,29 @@ def open_command():
 
 open_command()
 
+def hashString(string):
+	m = hashlib.md5()
+	m.update(string.encode("utf-8"))
+	return m.hexdigest()
+	
+
 def save_command():
+	
+	#with open(fullPath, "r") as file:
+	#	oldData = file.read()
+	
+	#data = textPad.get("1.0", END+"-1c") #Apparently the text widget adds blank
+	## line to text automaticaly, removes that
+	
+	#m1 = hashString(data)
+	#m2 = hashString(oldData)
+	
+	#if m1 == m2:
+	#	print("file is not changed skip write")
+	#	return
+	
 	with open(fullPath, "w") as file:
-		data = textPad.get("1.0", END+"-1c") #Apparently the text widget adds blank line to text automaticaly, removes that
+		 
 		file.write(data)
 		synchableChanges = True
 		#print("writes to file " + filename);
@@ -85,11 +109,8 @@ saveInterval()
 
 def synchInterval():
 	global synchableChanges
-	if synchableChanges:
-		print("syncs...");
-		if sync.syncFiles(): #from synch.py
-			synchableChanges = False
-	root.after(5000, synchInterval)
+	sync.syncFiles()
+	root.after(10000, synchInterval)
 	
 root.after(5000, synchInterval)
 

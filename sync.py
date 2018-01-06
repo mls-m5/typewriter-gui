@@ -73,6 +73,8 @@ def syncFiles():
 				succeded = False
 		else:
 			print("file " + originalFname + " is up to date")
+			
+	return succeded
 
 if __name__ == "__main__":
 	syncFiles()
