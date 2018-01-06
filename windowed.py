@@ -18,7 +18,7 @@ root = tkinter.Tk(className="Typist editor")
 windowWidth = root.winfo_screenwidth()
 windowHeight = root.winfo_screenheight()
 
-customFont = tkfont.Font(family="Courier 10 Pitch", size=10)
+customFont = tkfont.Font(family="Courier New", weight="normal", size=10)
 textPad = ScrolledText(root, width=20, height=10, font=customFont)
 textPad ["insertofftime"] = 0
 
@@ -101,4 +101,5 @@ def hello(args):
 
 textPad.focus()
 textPad.bind("<Control-BackSpace>", backspace_word)
+
 root.mainloop()
