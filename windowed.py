@@ -7,7 +7,11 @@ import tkinter.filedialog as fd
 import tkinter.messagebox as mb
 import tkinter.font as tkfont
 
-root = tkinter.Tk(className=" Just another Text Editor")
+import os
+
+import datetime #for filenames
+
+root = tkinter.Tk(className="Typist editor")
 
 
 
@@ -20,61 +24,66 @@ root.geometry("%dx%d" % (root.winfo_screenwidth(), root.winfo_screenheight()))
 textPad["width"] = int(root.winfo_screenwidth() / 8)
 textPad["height"] = int(root.winfo_screenheight() / 16)
 
-print(root.winfo_screenwidth())
-print(root.winfo_screenheight())
 
-textPad.insert(INSERT, root.winfo_screenwidth())
-textPad.insert(INSERT, root.winfo_screenheight())
+textPad.pack()
 
+#some data of the file
+filename = datetime.datetime.today().strftime('%Y-%m-%d')
+folder = "text"
+fullPath = os.path.join(folder, filename)
 
-# create a menu & define functions for each menu item
+#create folder if it does not exists
+if not os.path.exists(folder):
+	os.makedirs(folder)
 
 def open_command():
-    pass
-#         file = tkFileDialog.askopenfile(parent=root,mode='rb',title='Select a file')
-#         if file != None:
-#             contents = file.read()
-#             textPad.insert('1.0',contents)
-#             file.close()
-
-def save_command(self):
-    pass
-#     file = tkFileDialog.asksaveasfile(mode='w')
-#     if file != None:
-#     # slice off the last character from get, as an extra return is added
-#         data = self.textPad.get('1.0', END+'-1c')
-#         file.write(data)
-# #         file.close()
-        
-def exit_command():
-    pass
-#     if tkMessageBox.askokcancel("Quit", "Do you really want to quit?"):
-#         root.destroy()
+	try:
+		with open(fullPath) as file:
+			textPad.insert("1.0", file.read())
+			textPad.edit_modified(False) #so the file does not get written directly
+	except FileNotFoundError:
+		print("no file with the name " + filename + " exists, creating blank dockument")
 
 
-def about_command():
-    tkMessageBox.showinfo("About", "Just Another TextPad \n Copyright \n No rights left to reserve")
-    
+open_command()
 
-# menu = Menu(root)
-# root.config(menu=menu)
-# filemenu = Menu(menu)
-# menu.add_cascade(label="File", menu=filemenu)
-# # filemenu.add_command(label="New", command=dummy)
-# filemenu.add_command(label="Open...", command=open_command)
-# filemenu.add_command(label="Save", command=save_command)
-# filemenu.add_separator()
-# filemenu.add_command(label="Exit", command=exit_command)
-# helpmenu = Menu(menu)
-# menu.add_cascade(label="Help", menu=helpmenu)
-# helpmenu.add_command(label="About...", command=about_command)
+def save_command():
+	with open(fullPath, "w") as file:
+		data = textPad.get("1.0", END+"-1c") #Apparently the text widget adds blank line to text automaticaly, removes that
+		file.write(data)
+		#print("writes to file " + filename);
 
-#
-textPad.pack()
+def testSave():
+	if textPad.edit_modified():
+		textPad.edit_modified(False)
+		save_command()
+		
+def saveInterval():
+	testSave()
+	root.after(1000, saveInterval)
+	
+saveInterval()
+
+
+
+
+def backspace_word(event):
+	w = event.widget
+	charBeforeInsert = w.get("insert-1c", INSERT)
+	if charBeforeInsert == " " or charBeforeInsert == "	":
+		#clear spaces before next word
+		w.delete("insert-1c wordstart", INSERT)
+	event.widget.delete("insert-1c wordstart", INSERT)
+	#event.widget.delete("insert-1c", INSERT)
+	#event.widget.insert("insert wordstart", "hej")
+	return "break" #prevent event from propagating
 
 def hello(args):
     print("hello")
     return "break" #prevent event from propagating
+    
 
-textPad.bind("<Control-BackSpace>", hello)
+
+
+textPad.bind("<Control-BackSpace>", backspace_word)
 root.mainloop()
