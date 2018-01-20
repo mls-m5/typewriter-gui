@@ -75,21 +75,27 @@ def hashString(string):
 
 def save_command():
 	
-	#with open(fullPath, "r") as file:
-	#	oldData = file.read()
+	data = textPad.get("1.0", END+"-1c") #Apparently the text widget adds blank
+	try:
+		with open(fullPath, "r") as file:
+			oldData = file.read()
 	
-	#data = textPad.get("1.0", END+"-1c") #Apparently the text widget adds blank
-	## line to text automaticaly, removes that
+		# line to text automaticaly, removes that
 	
-	#m1 = hashString(data)
-	#m2 = hashString(oldData)
-	
-	#if m1 == m2:
-	#	print("file is not changed skip write")
-	#	return
+		m1 = hashString(data.strip())
+		m2 = hashString(oldData.strip())
+		#print(m1 + "\n")
+		#print(m2 + "\n")
+		
+		if m1 == m2:
+			#print("file is not changed, skip write")
+			return
+	except:
+		#If file could not be opened just write a new file
+		print("could not open file for comparison when saving")
+		pass
 	
 	with open(fullPath, "w") as file:
-		 
 		file.write(data)
 		synchableChanges = True
 		#print("writes to file " + filename);
@@ -110,7 +116,7 @@ saveInterval()
 def synchInterval():
 	global synchableChanges
 	sync.syncFiles()
-	root.after(10000, synchInterval)
+	root.after(5000, synchInterval)
 	
 root.after(5000, synchInterval)
 

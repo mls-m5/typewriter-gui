@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 import os
-from os import listdir
 from os.path import isfile, join
 import requests
 
@@ -37,15 +36,13 @@ def syncFiles():
 	succeded = True
 	
 	path = "text"
-	onlyfiles = [f for f in listdir(path) if isfile(join(path, f))]
+	onlyfiles = [f for f in os.listdir(path) if isfile(join(path, f))]
 	onlyfiles = [f for f in onlyfiles if not f.endswith(".mark")]
 
 	print(onlyfiles)
 
 
 	#jämför hur gamla de är ...
-
-	import os
 
 
 	#touch files (create if does not exist
