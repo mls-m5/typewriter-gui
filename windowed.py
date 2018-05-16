@@ -11,9 +11,9 @@ import os
 
 import hashlib
 
-import sync #my synching methods
+import sync  # my synching methods
 
-import datetime #for filenames
+import datetime  # for filenames
 
 root = tkinter.Tk(className="Typist editor")
 
@@ -22,13 +22,11 @@ windowHeight = root.winfo_screenheight()
 
 customFont = tkfont.Font(family="Courier New", weight="normal", size=10)
 textPad = ScrolledText(root, width=20, height=10, font=customFont)
-textPad ["insertofftime"] = 0
-
+textPad["insertofftime"] = 0
 
 root.geometry("%dx%d" % (windowWidth, windowHeight))
 
-
-#Remove borders
+# Remove borders
 textPad["borderwidth"] = 0
 textPad["highlightthickness"] = 0
 textPad.vbar["borderwidth"] = 0
@@ -46,99 +44,141 @@ textPad["pady"] = 5
 
 textPad.pack()
 
-#some data of the file
+infoFrame = None
+infoVisible = False
+
+
+def showHostName():
+    global infoFrame
+    import subprocess
+    hostname = subprocess.check_output("hostname -I", shell=True).decode('utf-8').split()[0]
+
+    infoFrame = Label(root, text= "Press F1 to toggle this message\n" + "ip: " + hostname)
+    infoFrame.pack()
+    infoFrame.place(x=0, y=0)
+
+
+def showInfo():
+    global infoVisible
+    showHostName()
+    infoVisible = True
+
+
+def hideInfo():
+    global infoVisible
+    infoFrame.place_forget()
+    infoVisible = False
+
+
+def toggle_info(event = None):
+    if infoVisible:
+        hideInfo()
+    else:
+        showInfo()
+
+toggle_info()
+# hideInfo()
+
+# some data of the file
 filename = datetime.datetime.today().strftime('%Y-%m-%d')
 folder = "text"
 fullPath = os.path.join(folder, filename)
 synchableChanges = True
 
-#create folder if it does not exists
+# create folder if it does not exists
 if not os.path.exists(folder):
-	os.makedirs(folder)
+    os.makedirs(folder)
+
 
 def open_command():
-	try:
-		with open(fullPath) as file:
-			textPad.insert("1.0", file.read())
-			textPad.edit_modified(False) #so the file does not get written directly
-	except FileNotFoundError:
-		print("no file with the name " + filename + " exists, creating blank dockument")
+    try:
+        with open(fullPath) as file:
+            textPad.insert("1.0", file.read())
+            textPad.edit_modified(False)  # so the file does not get written directly
+    except FileNotFoundError:
+        print("no file with the name " + filename + " exists, creating blank dockument")
 
 
 open_command()
 
+
 def hashString(string):
-	m = hashlib.md5()
-	m.update(string.encode("utf-8"))
-	return m.hexdigest()
-	
+    m = hashlib.md5()
+    m.update(string.encode("utf-8"))
+    return m.hexdigest()
+
 
 def save_command():
-	
-	data = textPad.get("1.0", END+"-1c") #Apparently the text widget adds blank
-	try:
-		with open(fullPath, "r") as file:
-			oldData = file.read()
-	
-		# line to text automaticaly, removes that
-	
-		m1 = hashString(data.strip())
-		m2 = hashString(oldData.strip())
-		#print(m1 + "\n")
-		#print(m2 + "\n")
-		
-		if m1 == m2:
-			#print("file is not changed, skip write")
-			return
-	except:
-		#If file could not be opened just write a new file
-		print("could not open file for comparison when saving")
-		pass
-	
-	with open(fullPath, "w") as file:
-		file.write(data)
-		synchableChanges = True
-		#print("writes to file " + filename);
+    data = textPad.get("1.0", END + "-1c")  # Apparently the text widget adds blank
+    try:
+        with open(fullPath, "r") as file:
+            oldData = file.read()
+
+        # line to text automaticaly, removes that
+
+        m1 = hashString(data.strip())
+        m2 = hashString(oldData.strip())
+        # print(m1 + "\n")
+        # print(m2 + "\n")
+
+        if m1 == m2:
+            # print("file is not changed, skip write")
+            return
+    except:
+        # If file could not be opened just write a new file
+        print("could not open file for comparison when saving")
+        pass
+
+    with open(fullPath, "w") as file:
+        file.write(data)
+        synchableChanges = True
+        # print("writes to file " + filename);
+
 
 def testSave():
-	if textPad.edit_modified():
-		textPad.edit_modified(False)
-		synchableChanges = True;
-		save_command()
-		
+    if textPad.edit_modified():
+        textPad.edit_modified(False)
+        synchableChanges = True;
+        save_command()
+
+
 def saveInterval():
-	testSave()
-	root.after(1000, saveInterval)
-	
+    testSave()
+    root.after(1000, saveInterval)
+
+
 saveInterval()
 
 
 def synchInterval():
-	global synchableChanges
-	sync.syncFiles()
-	root.after(5000, synchInterval)
-	
+    global synchableChanges
+    sync.syncFiles()
+    root.after(5000, synchInterval)
+
+
 root.after(5000, synchInterval)
 
+
 def backspace_word(event):
-	w = event.widget
-	charBeforeInsert = w.get("insert-1c", INSERT)
-	if charBeforeInsert == " " or charBeforeInsert == "	":
-		#clear spaces before next word
-		w.delete("insert-1c wordstart", INSERT)
-	event.widget.delete("insert-1c wordstart", INSERT)
-	#event.widget.delete("insert-1c", INSERT)
-	#event.widget.insert("insert wordstart", "hej")
-	return "break" #prevent event from propagating
+    w = event.widget
+    charBeforeInsert = w.get("insert-1c", INSERT)
+    if charBeforeInsert == " " or charBeforeInsert == "	":
+        # clear spaces before next word
+        w.delete("insert-1c wordstart", INSERT)
+    event.widget.delete("insert-1c wordstart", INSERT)
+    # event.widget.delete("insert-1c", INSERT)
+    # event.widget.insert("insert wordstart", "hej")
+    return "break"  # prevent event from propagating
+
 
 def hello(args):
     print("hello")
-    return "break" #prevent event from propagating
-    
+    return "break"  # prevent event from propagating
 
 
 textPad.focus()
 textPad.bind("<Control-BackSpace>", backspace_word)
+textPad.bind("<F1>", toggle_info)
 
 root.configure(background="white")
 
