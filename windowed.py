@@ -11,7 +11,12 @@ import os
 
 import hashlib
 
-import sync  # my synching methods
+sync_enabled = False
+try:
+    import sync  # my synching methods
+    sync_enabled = True
+except e:
+    print ("synching disabled")
 
 import datetime  # for filenames
 
@@ -51,7 +56,12 @@ infoVisible = False
 def showHostName():
     global infoFrame
     import subprocess
-    hostname = subprocess.check_output("hostname -I", shell=True).decode('utf-8').split()[0]
+    from sys import platform
+    if platform == "linux" or platform == "linux2":
+        hostname = subprocess.check_output("hostname -I", shell=True).decode('utf-8').split()[0]
+    else:
+        import socket
+        hostname = socket.gethostbyname(socket.gethostname())
 
     infoFrame = Label(root, text= "Press F1 to toggle this message\n" + "ip: " + hostname)
     infoFrame.pack()
