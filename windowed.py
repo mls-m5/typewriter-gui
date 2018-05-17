@@ -53,24 +53,28 @@ infoFrame = None
 infoVisible = False
 
 
-def showHostName():
+def showInfoText(info_text):
     global infoFrame
-    import subprocess
+    infoFrame = Label(root, text=info_text)
+    infoFrame.pack()
+    infoFrame.place(x=0, y=0)
+
+def getHostName():
     from sys import platform
-    if platform == "linux" or platform == "linux2":
+    if platform == "linux" or platform == "linux2":    
+        import subprocess
         hostname = subprocess.check_output("hostname -I", shell=True).decode('utf-8').split()[0]
     else:
         import socket
         hostname = socket.gethostbyname(socket.gethostname())
-
-    infoFrame = Label(root, text= "Press F1 to toggle this message\n" + "ip: " + hostname)
-    infoFrame.pack()
-    infoFrame.place(x=0, y=0)
-
+    return hostname
 
 def showInfo():
     global infoVisible
-    showHostName()
+    
+    hostname = getHostName()
+    info_text =  "Press F1 to toggle this message\n" + "ip: " + hostname
+    showInfoText(info_text)
     infoVisible = True
 
 
@@ -87,7 +91,6 @@ def toggle_info(event = None):
         showInfo()
 
 toggle_info()
-# hideInfo()
 
 # some data of the file
 filename = datetime.datetime.today().strftime('%Y-%m-%d')
