@@ -55,7 +55,7 @@ infoVisible = False
 
 def showInfoText(info_text):
     global infoFrame
-    infoFrame = Label(root, text=info_text)
+    infoFrame = Label(root, text=info_text, justify=LEFT)
     infoFrame.pack()
     infoFrame.place(x=0, y=0)
 
@@ -71,9 +71,15 @@ def getHostName():
 
 def showInfo():
     global infoVisible
+    global textPad
     
     hostname = getHostName()
     info_text =  "Press F1 to toggle this message\n" + "ip: " + hostname
+    textPadText = textPad.get("1.0", END + "-1c")
+    info_text += "\nwords: " + str(len(textPadText.split()))
+    info_text += "\nletters: " + str(len(textPadText))
+    info_text += "\nletters (no space): " + str(len("".join(textPadText.split())))
+
     showInfoText(info_text)
     infoVisible = True
 
@@ -90,7 +96,6 @@ def toggle_info(event = None):
     else:
         showInfo()
 
-toggle_info()
 
 # some data of the file
 filename = datetime.datetime.today().strftime('%Y-%m-%d')
@@ -194,5 +199,8 @@ textPad.bind("<Control-BackSpace>", backspace_word)
 textPad.bind("<F1>", toggle_info)
 
 root.configure(background="white")
+
+
+toggle_info()
 
 root.mainloop()
