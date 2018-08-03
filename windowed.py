@@ -33,7 +33,7 @@ customFont = tkfont.Font(family="Courier New", weight="normal", size=10)
 textPad = ScrolledText(root, width=20, height=10, font=customFont)
 textPad["insertofftime"] = 0
 
-version = 1.002
+version = 1.003
 
 root.geometry("%dx%d" % (windowWidth, windowHeight))
 
@@ -91,6 +91,7 @@ def showInfo():
     hostname = getHostName()
     info_text =  "Press F1 to toggle this message\n" + "ip: " + hostname
     info_text += "\nPress F3 to save to usbdrive"
+    info_text += "\nPress F12 to update and reboot"
     textPadText = textPad.get("1.0", END + "-1c")
     info_text += "\nwords: " + str(len(textPadText.split()))
     info_text += "\nletters: " + str(len(textPadText))
@@ -115,6 +116,10 @@ def toggle_info(event = None):
 
 def save_to_disk(event = None):
     subprocess.Popen(["./usbsave.sh", fullPath])
+
+def git_pull(event = None):
+    subprocess.Popen(["git", "pull"])
+    subprocess.Popen(["sudo", "reboot"])
 
 
 
@@ -220,6 +225,7 @@ textPad.focus()
 textPad.bind("<Control-BackSpace>", backspace_word)
 textPad.bind("<F1>", toggle_info)
 textPad.bind("<F3>", save_to_disk)
+textPad.bind("<F12>", git_pull)
 
 root.configure(background="white")
 
