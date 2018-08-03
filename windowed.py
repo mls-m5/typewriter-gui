@@ -33,7 +33,7 @@ customFont = tkfont.Font(family="Courier New", weight="normal", size=10)
 textPad = ScrolledText(root, width=20, height=10, font=customFont)
 textPad["insertofftime"] = 0
 
-version = 1.001
+version = 1.002
 
 root.geometry("%dx%d" % (windowWidth, windowHeight))
 
@@ -114,7 +114,7 @@ def toggle_info(event = None):
         showInfo()
 
 def save_to_disk(event = None):
-    subprocess.Popen(["sudo", "./usbsave.sh", "2018-05-28"])
+    subprocess.Popen(["./usbsave.sh", fullPath])
 
 
 
