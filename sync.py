@@ -21,9 +21,19 @@ def synchSingleFile(name, path):
 	print("trying to upload file\n")
 	print(payload)
 	
-	r = requests.post("http://xn--laserskld-67a.se/typist/submit.php", data=payload)
-	print(r.status_code)
-	print(r.text)
+	try:
+		print("posting:")
+		r = requests.post("http://xn--laserskld-67a.se/typist/submit.php", data=payload, timeout=0.001)
+		print(r.status_code)
+		print(r.text)
+	except requests.exceptions.Timeout:
+		print("failed to fetch - timeout")
+		return False
+	except:
+		print("failed to synch by some reason")
+		return False
+
+
 	return r.status_code < 300
 
 def syncFiles():

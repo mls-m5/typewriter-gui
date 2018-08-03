@@ -11,12 +11,16 @@ import os
 
 import hashlib
 
+import subprocess
+
 sync_enabled = False
-try:
-    import sync  # my synching methods
-    sync_enabled = True
-except e:
-    print ("synching disabled")
+
+#Synching is disabled for security reasons
+# try:
+#     import sync  # my synching methods
+#     sync_enabled = True
+# except e:
+#     print ("synching disabled")
 
 import datetime  # for filenames
 
@@ -28,6 +32,8 @@ windowHeight = root.winfo_screenheight()
 customFont = tkfont.Font(family="Courier New", weight="normal", size=10)
 textPad = ScrolledText(root, width=20, height=10, font=customFont)
 textPad["insertofftime"] = 0
+
+version = 1.001
 
 root.geometry("%dx%d" % (windowWidth, windowHeight))
 
@@ -72,13 +78,16 @@ def getHostName():
 def showInfo():
     global infoVisible
     global textPad
+    global version
     
     hostname = getHostName()
     info_text =  "Press F1 to toggle this message\n" + "ip: " + hostname
+    info_text += "\nPress F3 to save to usbdrive"
     textPadText = textPad.get("1.0", END + "-1c")
     info_text += "\nwords: " + str(len(textPadText.split()))
     info_text += "\nletters: " + str(len(textPadText))
     info_text += "\nletters (no space): " + str(len("".join(textPadText.split())))
+    info_text += "\nversion: " + str(version)
 
     showInfoText(info_text)
     infoVisible = True
@@ -95,6 +104,10 @@ def toggle_info(event = None):
         hideInfo()
     else:
         showInfo()
+
+def save_to_disk(event = None):
+    subprocess.Popen(["sudo", "./usbsave.sh", "2018-05-28"])
+
 
 
 # some data of the file
@@ -174,7 +187,8 @@ def synchInterval():
     root.after(5000, synchInterval)
 
 
-root.after(5000, synchInterval)
+if sync_enabled:
+    root.after(5000, synchInterval)
 
 
 def backspace_word(event):
@@ -197,6 +211,7 @@ def hello(args):
 textPad.focus()
 textPad.bind("<Control-BackSpace>", backspace_word)
 textPad.bind("<F1>", toggle_info)
+textPad.bind("<F3>", save_to_disk)
 
 root.configure(background="white")
 
