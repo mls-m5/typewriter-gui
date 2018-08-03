@@ -69,10 +69,18 @@ def getHostName():
     from sys import platform
     if platform == "linux" or platform == "linux2":    
         import subprocess
-        hostname = subprocess.check_output("hostname -I", shell=True).decode('utf-8').split()[0]
+        try:
+            hostname = subprocess.check_output("hostname -I", shell=True).decode('utf-8').split()[0]
+        except:
+            print("failed to get host name...")
+            return "no internet connection"
     else:
         import socket
-        hostname = socket.gethostbyname(socket.gethostname())
+        try:
+            hostname = socket.gethostbyname(socket.gethostname())
+        except:
+            print("failed to get host name...")
+            return "no internet connection"
     return hostname
 
 def showInfo():
